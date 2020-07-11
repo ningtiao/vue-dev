@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Runtime + compiler</title>
+</head>
+
+<body>
+  <div id="app">
+    Hello word
+  </div>
+  <script src="../../dist/vue.runtime.js"></script>
+  <script>
+    // let vm = new Vue({
+    //   el: '#app',
+    //   template: '<h1>{{ msg }}</h1>',
+    //   data: {
+    //     msg: 'Hello Vue'
+    //   }
+    // })
+    let vm = new Vue({
+      el: '#app',
+      render(h) {
+        return h('h1', this.msg)
+      },
+      data: {
+        msg: 'Hello Vue'
+      }
+    })
+
+  </script>
+</body>
+
+</html>
