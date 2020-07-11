@@ -223,3 +223,96 @@ if (process.env.TARGET) {
 - dev打包就是dist文件中的一个版本
 - build是所有的版本
 - TARGET:web-full-dev需要打包的版本
+
+
+### 从入口开始
+- src/platform/web/entry-runtime-with-compiler.js
+
+### 通过查看源码解决下面问题
+- 观察以下代码,通过阅读源码,回答在页面上输出的结果
+```js
+const vm = new Vue({
+  el: '#app',
+  template: '<h3> Hello template</h3>',
+  render (h) {
+    return h('h4', 'Hello render')
+  }
+})
+```
+如果传入了render函数 不处理template,直接调用mount方法
+
+### 阅读源码记录
+- el不能是body或者html标签
+- 如果没有render,把template 转换成render函数
+- 如果有render方法,直接调用mount挂载DOM
+
+```js
+  // el不能是body 或者html
+  if (el === document.body || el === document.documentElement) {
+    process.env.NODE_ENV !== 'production' && warn(
+      `Do not mount Vue to <html> or <body> - mount to normal elements instead.`
+    )
+    return this
+  }
+
+  const options = this.$options
+  // resolve template/el and convert to render function
+  // 把template/el 转换成render函数
+  if (!options.render) {
+    ...
+    // 2把template/el转换成render 函数
+  }
+  // 3调用mount 方法,挂载DOM
+  - 调试代码
+  - 调试的方法
+```
+
+```js
+const vm = new Vue({
+  el: '#app',
+  template: '<h3> Hello template</h3>',
+  render (h) {
+    return h('h4', 'Hello render')
+  }
+})
+```
+
+### 7.Vue 初始化过程
+
+##### 四个导出Vue的模块
+
+- sl/platforms/wb/entry runtime with compilrjis
+  - web平台相关的入口
+  - 重写了平台相关的Smount)方法
+  - 注册了Vue compile()方法，传递一个HTML字符串返回render函数
+- src/platforms/web/runtime/index.js
+  - web平台相关
+  - 注册和平台相关的全局指令: v-model. v-show
+  - 注册和平台相关的全局组件: Vtransion. vtansition-group
+  - 全局方法:
+    - patch _:把虚拟DOM转换成真实DOM
+
+    - $mount:挂载方法
+
+- src/core/index.js
+- 与平台无关
+  - 设置了Vue的静态方法，itiltbalaPl(Vue)
+- src/core/instance/index.js
+  - 与平台无关
+  - 定义了构造函数，调用了this, iptons)方法
+  - 给Vue中混入了常用的实例成员
+
+- 在platforms/web/runtime/index.js下的文件主要做了以下事情
+在这个文件中所有代码都是和平台相关的,注册了平台相关的一些指令
+patch函数以及$mount这个两个方法
+
+- `import Vue from 'core/index'` 导入了构造函数
+
+- 在core/index.js中,调用了 initGlobalAPI(Vue)方法,给vue的构造函数增加以下静态方法,其他内容都是调用Object.defineProperty给Vue增加了一些成员,还有服务端渲染SSR,
+
+- core/global-api初始化了Vue的静态方法
+- instance/index.js 创建了Vue构造函数,设置了Vue实例成员
+
+### 8.Vue 初始化问题
+- Flow 语法红线   "javascript.validate.enable": false
+- TS代码高亮 Babel JavaScript 插件
