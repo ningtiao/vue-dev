@@ -316,3 +316,34 @@ patch函数以及$mount这个两个方法
 ### 8.Vue 初始化问题
 - Flow 语法红线   "javascript.validate.enable": false
 - TS代码高亮 Babel JavaScript 插件
+
+### 9. Vue初始化-静态成员
+
+### 10. Vue初始化实例
+- instance文件夹
+- index.js 定义了Vue的构造函数,并且调用了 initMixin(Vue), stateMixin(Vue),eventsMixin(Vue), lifecycleMixin(Vue)
+renderMixin(Vue)
+
+- initMixin(Vue) 就是在Vue的原型上挂载了_init()方法
+- stateMixin(Vue) 通过Object.defineProperty(Vue.proptotype, '$data', dataDef) Object.defineProperty(Vue.proptotype, '$props', propsDef)在Vue原型上增加了两个属性
+
+- eventsMixin(Vue) 分别定义了 `$on,$once,$off,$emit`事件,使用发布订阅模式
+- lifecycleMixin(Vue) 定义了forceUpdate destory()
+- renderMixin
+
+这几个函数的作用都是给Vue原型混入一些成员和属性,给Vue对象增加相应的实例成员
+```js
+// 注册vm的_init()方法, 初始化vm
+initMixin(Vue)
+// 注册vm 的$data/$props/$set/$delete/$watch
+stateMixin(Vue)
+// 初始化事件相关方法
+//$on/$once/$off/$emit
+eventsMixin(Vue)
+// 初始化生命周期相关的混入方法
+// _update/$forceUpdate/$destroy
+lifecycleMixin(Vue)
+// 混入 render
+// $nextTick/_render
+renderMixin(Vue)
+```
