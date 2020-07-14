@@ -162,17 +162,22 @@ export function defineReactive (
   if ((!getter || setter) && arguments.length === 2) {
     val = obj[key]
   }
-
+  // 判断是否递归观察子对象,并将子对象属性都转化为getter/setter，返回子观察对象
   let childOb = !shallow && observe(val)
   Object.defineProperty(obj, key, {
     enumerable: true,
     configurable: true,
     get: function reactiveGetter () {
+      // 如果预定义的getter 存在则Value等于getter调用的返回值
+      // 否则直接赋予属性值
       const value = getter ? getter.call(obj) : val
+      // 如果存在当前依赖目标,即watcher对象,则建立依赖
       if (Dep.target) {
         dep.depend()
+        // 如果子观察目标存在,建立子对象的依赖关系
         if (childOb) {
           childOb.dep.depend()
+          // 如果属性是数组,则特殊处理收集数组对象依赖
           if (Array.isArray(value)) {
             dependArray(value)
           }

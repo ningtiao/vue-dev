@@ -447,3 +447,5 @@ if (opts.data) {
 
 ### 18.数据响应式原理-defineReactive 
 Observer类被附加到每一个附加对象,派发更新
+
+### 19.数据响应式原理-依赖收集
