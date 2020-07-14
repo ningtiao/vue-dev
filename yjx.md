@@ -421,3 +421,29 @@ observe(data, true)
 
 ### 15.首先渲染的总结
 //见 为知笔记第三张图片
+
+### 16. 数据响应式原理
+通过查看源码解决下面问题
+- vm.msg = { count: 0 },重新给属性赋值,是否是响应式
+- vm.arr[0] = 4,给数组元素赋值,视图是否会更新
+- vm.arr.length = 0,修改数组的length,视图是否会更新
+- vm.arr.push(1),视图是否会更新
+**响应式处理的入口**
+整个响应式处理的过程是比较复杂的,
+- src\core\instance\state.js
+- initState(vm) vm状态的初始化
+- 初始化了_data、_props、methods等
+- src\core\instande\state.js
+```javascript
+//数据的初始化
+if (opts.data) {
+  initData(vm)
+} else {
+  observe(vm._data = {}, true)
+}
+```
+### 17.数据响应式原理-Observe
+
+
+### 18.数据响应式原理-defineReactive 
+Observer类被附加到每一个附加对象,派发更新
