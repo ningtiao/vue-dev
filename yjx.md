@@ -347,3 +347,77 @@ lifecycleMixin(Vue)
 // $nextTick/_render
 renderMixin(Vue)
 ```
+
+### 11.Vue实例-实例成员-init
+
+### 12.Vue实例-实例成员-initState
+初始化vm的 _props/methods/_data/computed/watch
+```javascript
+export function initState (vm: Component) {
+  vm._watchers = []
+  const opts = vm.$options
+  if (opts.props) initProps(vm, opts.props)
+  if (opts.methods) initMethods(vm, opts.methods)
+  if (opts.data) {
+    initData(vm)
+  } else {
+    observe(vm._data = {}, true /* asRootData */)
+  }
+  if (opts.computed) initComputed(vm, opts.computed)
+  if (opts.watch && opts.watch !== nativeWatch) {
+    initWatch(vm, opts.watch)
+  }
+}
+```
+
+在`instance/state.js`中,首先获取了`Vue`实例中的`$options`,然后判断`options`中是否有`props,methods,data`以及`computed`和`watch`这些属性,如果有的话,通过`initProps`进行初始化
+
+`initProps(vm, opts.props)`接收了两个参数,一个是`Vue`实例,一个是`Props`属性,我们跳转到`initProps`函数中,首先给`Vue`实例定义了一个`_Props`对象, 并且把它存储到了常量里面
+```js
+const props = vm._props = {}
+```
+紧接着,开始遍历`PropsOptions`的所有属性,它其实就是`initProps`方法中的第二个参数,遍历每个属性,然后通过`defineReactive`注入到`Props`这个对象上,这个`props`其实就是`vm._props`所有的成员都会通过`defineReacttive`转化为`get`和`set`,最后在`Props`对象上存储,
+**注意**
+- 在开发模式中,如果我们直接给这个属性赋值的话,会发出一个警告,
+- 生产环境中直接通过`defineReactive`把`props`中的属性转化成`get`和`set`
+- 最后判断了`props`属性是否在`Vue`实例中存在,不存在通过`Proxy`这个函数把我们的属性注入到`Vue`的实例中
+
+在`Proxy`中,通过调用`Object.defineProperty(target, key,sharePropertyDefinition)`
+
+总结`initProps`的作用就是把我们的`Props`成员转化成响应式数据,并且注入到`Vue`实例里面中
+
+接下来看`initMethods`
+
+在`initMethods(vm, opts.methods)`中,也是接收两个参数,Vue实例和选项中的`methods`,首先获取了选项中的Props,接着遍历methods所有属性,接着判断当前的环境是否是开发或者生产
+开发环境会判断methods是否是functicon
+
+接着判断methods方法的名称是否在Props对象中存在,存在就会发送一个警告,警告在属性在Props中已经存在,因为Props和methods最终都要注入到Vue实例上,不能出现同名
+
+下面继续判断key是否在Vue中存在,并且调用了isReserved(key),判断我们的key是否以_开头或$开头
+最后把methods注入到Vue实例上来,注入的时候会判断是否是function,如果不是返回noop,是的话把函数返回`bind(methods[key], vm)`
+
+总结 initMethods作用就是把选项的methods注入到vue实例,在注入之前,会先判断我们命名是否在Props中存在,并且判断了命名的规范,不建议_和$开头
+
+> 接下来看initData(vm)
+当options中有data选项时,会调用initData(vm)
+当没有的时候此时会给vm初始化一个_data属性observe(vm._data = {}, true),然后调用observe函数,observe是响应式中的一个函数
+
+在initData中获取了options的data选项,判断了data选项是否是function,如果是调用getData(data,vm)
+接着获取data中的所有属性,同时获取了props,methods中所有的属性
+```js
+const keys = Object.keys(data)
+const props = vm.$options.props
+const methods = vm.$options.methods
+
+```
+最后做一个响应式处理
+```js
+observe(data, true)
+```
+
+### 13.调试Vue初始化过程
+
+### 14.首次渲染的过程
+
+### 15.首先渲染的总结
+//见 为知笔记第三张图片
