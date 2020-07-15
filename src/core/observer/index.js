@@ -59,6 +59,7 @@ export class Observer {
       // 为数组中的每一个对象创建一个observer实例
       this.observeArray(value)
     } else {
+      // 变量对象中的每一个属性,转成setter/getter
       this.walk(value)
     }
   }
