@@ -619,3 +619,51 @@ vm.$watch('user',function(newValue,oldValue){
 vm.$watch()
 
 - src/core/instance/state.js
+
+### 32.更新异步队列-nextTick
+
+- Vue 更新DOM 是异步执行的,批量的
+- 在下次DOM更新循环结束之后执行延迟回调,在修改数据之后立即使用这个方法,获取更新后的DOM
+- vm.$nextTick(function(){ /*操作DOM*/}) Vue.nextTick(function() {})
+
+vm.$nextTick 代码演示
+```js
+<div id="app">
+  <p ref="p1">{{msg}}</p>
+</div>
+<script src="../../dist/vue.js"></script>
+const vm = new Vue({
+  el: '#app',
+  data: {
+    msg: 'Hello nextTick',
+    name: 'Vue.js',
+    title: 'Title',
+  },
+  mounted() {
+    this.msg  = 'Hello Word'
+    this.name = 'Hello snabbdom'
+    this.title = 'Vue.js'
+
+    this.$nextTick(() => {
+      console.log(this.$refs.p1.textContent)
+    })
+  }
+})
+```
+
+### 31.源码分析nextTick源码
+定义位置
+
+- src/core/instance/render.js
+
+```js
+Vue.prototype.$nextTick = function(fn: Function) {
+  return nextTick(fn, this)
+}
+```
+源码
+
+- 手动调用vm.$nextTick()
+
+- 在Watcher的queueWatcher 中执行nextTick
+- src/core/util/next-tick.js

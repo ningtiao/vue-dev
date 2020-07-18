@@ -79,7 +79,7 @@ function initProps (vm: Component, propsOptions: Object) {
     if (process.env.NODE_ENV !== 'production') {
       const hyphenatedKey = hyphenate(key)
       if (isReservedAttribute(hyphenatedKey) ||
-          config.isReservedAttr(hyphenatedKey)) {
+        config.isReservedAttr(hyphenatedKey)) {
         warn(
           `"${hyphenatedKey}" is a reserved attribute and cannot be used as component prop.`,
           vm
@@ -227,7 +227,7 @@ export function defineComputed (
     sharedPropertyDefinition.set = userDef.set || noop
   }
   if (process.env.NODE_ENV !== 'production' &&
-      sharedPropertyDefinition.set === noop) {
+    sharedPropertyDefinition.set === noop) {
     sharedPropertyDefinition.set = function () {
       warn(
         `Computed property "${key}" was assigned to but it has no setter.`,
@@ -253,7 +253,7 @@ function createComputedGetter (key) {
   }
 }
 
-function createGetterInvoker(fn) {
+function createGetterInvoker (fn) {
   return function computedGetter () {
     return fn.call(this, this)
   }
@@ -347,20 +347,27 @@ export function stateMixin (Vue: Class<Component>) {
     cb: any,
     options?: Object
   ): Function {
+    // 获取 Vue实例 this
     const vm: Component = this
     if (isPlainObject(cb)) {
+      // 判断如果是cb 是对象执行createWatcher
       return createWatcher(vm, expOrFn, cb, options)
     }
     options = options || {}
+    // 标记为用户watcher
     options.user = true
+    // 创建用户watcher对象
     const watcher = new Watcher(vm, expOrFn, cb, options)
+    // 判断immediate 如果为true
     if (options.immediate) {
+      // 立即执行一次cb回调,并把当前值传入
       try {
         cb.call(vm, watcher.value)
       } catch (error) {
         handleError(error, vm, `callback for immediate watcher "${watcher.expression}"`)
       }
     }
+    // 返回取消监听的方法
     return function unwatchFn () {
       watcher.teardown()
     }
