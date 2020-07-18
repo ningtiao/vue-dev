@@ -455,3 +455,167 @@ Observer类被附加到每一个附加对象,派发更新
 ### 21.数据响应式原理数组
 
 ### 22.数组响应式原理-数组练习
+
+### 23.数据响应式原理-调试上
+
+调试响应式数据执行过程
+- 数组响应式处理的核心过程和数组收集依赖的过程
+- 当数组的数据改变的时候watcher的执行过程
+```js
+<div id="app">
+{{arr}}
+<div>
+<script>
+const vm = new Vue({
+  el: '#app',
+  data: {
+    arr: [2,3,5]
+  }
+})
+</script>
+```
+
+### 24.数据响应式原理-调试下
+
+### 25.数据响应式原理总结
+见为知笔记图
+### 26.动态增加一个响应式属性
+
+```js
+let vm = new Vue({
+  el: '#app',
+  data: {
+    obj: {
+      title: 'Hello Vue'
+    },
+    arr: [1, 2, 3]
+  }
+})
+
+vm.obj.name = '大白菜' // 非响应式的
+
+vm.$set(vm.obj, 'name', '大白菜')
+```
+当修改数组的时候 
+```js
+vm.$set(vm.arr, 0, 100)
+```
+
+### Vue Set源码
+定义位置
+- Vue.set()
+- global-apo/index.js
+
+```js
+// 静态方法 set/delete/nextTick
+Vue.set = set
+Vue.delete = delete
+Vue.nextTick = nextTick
+```
+vm.$set()
+instance/index.js
+```js
+// 注册vm的$data/$props/$set/$delete/$watch
+// instance/state.js
+stateMixin(Vue)
+// instane/state.js
+Vue.prototype.$set = set
+Vue.prototype.$delete = del
+```
+当时用set给数组设置属性时,会调用splice方法
+当时用set给对象增加新的成员时,会调用defineReactive()
+最终他们都会调用ob.dep.notify()发送通知
+
+### 27 set调式
+
+
+### 28. vm.$delete
+**功能**
+- 删除对象的属性,如果对象是响应式的,确保删除能触发更新视图,这个方法主要用于避开Vue不能检测到属性被删除的限制,但是你应该很少会使用它
+
+> 注意 目标对象不能是一个Vue实例或者Vue实例的根数据对象
+
+- 示例
+```js
+vm.$delete(vm.obj, 'msg')
+```
+
+定义位置
+```js
+Vue.delete()
+global-api.index.js
+```
+静态方法set/delete/nextTick
+
+### 29.delete源码
+
+定义位置
+- Vue.delete()
+- global-api/index.js
+
+```js
+// 静态方法 set/delete/nextTick
+Vue.set = set
+Vue.delete = del
+Vue.nextTick = nextTick
+```
+vm.$delete()
+
+instance/index.js
+
+```js
+steatMixin(Vue)
+
+// /instance/state.js
+Vue.prototype.$set = set
+Vue.prototype.$delete = del
+```
+### 30.watch-回顾
+vm.$watch(expOrFn,callback,[options])
+
+**功能**
+
+- 观察Vue实例变化的一个表达式或计算属性函数。回调函数得到的参数为新值和旧值。表达式只接受监督的键路径。对于更复杂的表达式，用一个函数取代。
+
+**参数**
+- expOrFn:要监视的$data中的属性，可以是表达式或函数
+- callback:数据变化后执行的函数
+- 函数:回调函数
+- 对象:具有handler属性(字符串或者函数)，如果该属性为字符串则methods中相应的定义
+- options:可选的选项
+- deep:布尔类型，深度监听
+- immediate:布尔类型，是否立即执行-次回调函数
+**示例**
+```js
+const vm = new Vue({
+  el: '#app',
+  data: {
+    a: '1',
+    b: '2',
+    msg: 'Hello Vue',
+    user: {
+      firstName: '大白菜',
+      lastName: '米糕',
+      fullName: ''
+    }
+  }
+})
+
+vm.$watch('user',function(newValue,oldValue){
+  this.user.fullName = newValue.firstName + '' + newValue.lastName
+}, {
+  immediate: true,
+  deep: true
+})
+```
+
+### 31.三种类型的Watcher对R
+
+- 没有静态方法，因为$watch方法中要使用Vue的实例
+
+- Watcher分三种:计算属性Watcher、 用户Watcher (侦听器)、渲染Watcher
+- 创建顺序:计算属性Watcher、 用户Watcher (侦听器)、 渲染Watcher
+
+vm.$watch()
+
+- src/core/instance/state.js

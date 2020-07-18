@@ -225,16 +225,22 @@ export function set (target: Array<any> | Object, key: any, val: any): any {
   ) {
     warn(`Cannot set reactive property on undefined, null, or primitive value: ${(target: any)}`)
   }
+  // 判断target 是否是对象,key 是否是合法的索引
   if (Array.isArray(target) && isValidArrayIndex(key)) {
     target.length = Math.max(target.length, key)
+    // 通过splice 对key位置的元素进行替换
+    // splice在array.js进行响应化的处理
     target.splice(key, 1, val)
     return val
   }
+  // 如果key在对象中已经存在直接赋值
   if (key in target && !(key in Object.prototype)) {
     target[key] = val
     return val
   }
+  // 获取target中的observer对象
   const ob = (target: any).__ob__
+  // 如果target 是Vue实例或者$data则直接返回
   if (target._isVue || (ob && ob.vmCount)) {
     process.env.NODE_ENV !== 'production' && warn(
       'Avoid adding reactive properties to a Vue instance or its root $data ' +
@@ -242,11 +248,14 @@ export function set (target: Array<any> | Object, key: any, val: any): any {
     )
     return val
   }
+  // 如果ob 不存在,target 不是响应式对象直接赋值
   if (!ob) {
     target[key] = val
     return val
   }
+  // 把key 设置为响应式属性
   defineReactive(ob.value, key, val)
+  // 发送通知
   ob.dep.notify()
   return val
 }
@@ -260,11 +269,15 @@ export function del (target: Array<any> | Object, key: any) {
   ) {
     warn(`Cannot delete reactive property on undefined, null, or primitive value: ${(target: any)}`)
   }
+  // 判断是否是数组,以及key是否合法
   if (Array.isArray(target) && isValidArrayIndex(key)) {
+    // 如果是数组通过splice 删除
+    // splice 做过响应式处理
     target.splice(key, 1)
     return
   }
   const ob = (target: any).__ob__
+  // target 如果是Vue实例或者$data 对象,直接返回
   if (target._isVue || (ob && ob.vmCount)) {
     process.env.NODE_ENV !== 'production' && warn(
       'Avoid deleting properties on a Vue instance or its root $data ' +
@@ -272,13 +285,16 @@ export function del (target: Array<any> | Object, key: any) {
     )
     return
   }
+  // 如果target 对象没有key属性直接返回
   if (!hasOwn(target, key)) {
     return
   }
+  // 删除属性
   delete target[key]
   if (!ob) {
     return
   }
+  // 通过 ob发送通知
   ob.dep.notify()
 }
 
