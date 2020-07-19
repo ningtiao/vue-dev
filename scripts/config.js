@@ -265,8 +265,7 @@ function genConfig (name) {
 
 
 // 判断环境变量是否有TARGET
-// 如果有的话使用genConfig()
-
+// 如果有的话使用genConfig() 生成rollup配置文件
 if (process.env.TARGET) {
   module.exports = genConfig(process.env.TARGET)
 } else {
