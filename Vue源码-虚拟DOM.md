@@ -79,3 +79,60 @@ export function createElement (
 ```
 
 首先判断了参数的问题,调用_createElement(),在该函数中创建了Vnode的对象,判断Data是否为空, 如果data不为空并且Data有ob属性,则说明data是响应式的数据,如果是响应式的数据会调用createEmptyVNode()
+
+### update
+定义在 src/core/instance/lifecycle.js
+```js
+if (process.env.NODE_ENV !== 'production' && config.performance && mark) {
+  updateComponent = () => {
+    ...
+  }
+} else {
+  updateComponent = () => {
+    vm._update(vm._render(), hydrating)
+  }
+}
+```
+
+```js
+// 首次渲染会调用,数据更新会调用
+Vue.prototype._update = function (vnode: VNode, hydrating?: boolean) {
+  const vm: Component = this
+  const prevEl = vm.$el
+  const prevVnode = vm._vnode
+  const restoreActiveInstance = setActiveInstance(vm)
+  vm._vnode = vnode
+  // Vue.prototype.__patch__ is injected in entry points
+  // based on the rendering backend used.
+  if (!prevVnode) {
+    // initial render
+    vm.$el = vm.__patch__(vm.$el, vnode, hydrating, false /* removeOnly */)
+  } else {
+    // updates
+    vm.$el = vm.__patch__(prevVnode, vnode)
+  }
+  restoreActiveInstance()
+  // update __vue__ reference
+  if (prevEl) {
+    prevEl.__vue__ = null
+  }
+  if (vm.$el) {
+    vm.$el.__vue__ = vm
+  }
+  // if parent is an HOC, update its $el as well
+  if (vm.$vnode && vm.$parent && vm.$vnode === vm.$parent._vnode) {
+    vm.$parent.$el = vm.$el
+  }
+  // updated hook is called by the scheduler to ensure that children are
+  // updated in a parent's updated hook.
+}
+```
+将创建好的VNode对象传递刚给update方法
+核心是调用了vm.__patch__方法,在调用之前,判断了prevVnode
+prevVnode是从Vue实例获取_vnode,而_vnode是记录之前所处理的vnode对象
+如果不存在vnode,则说明是首次渲染,会调用__patch__方法,传入真实DOM vm.$el,第二个参数就是Vnode
+
+在__patch__方法中会把真实DOM转换成虚拟DOM,然后和新的Vnode进行比较,并且会把比较的结果更新到真实的DOM,最后将返回的结果存储到$el
+
+当数据改变后,会继续调用update方法,此时prevVnode有值,就会执行
+`vm.$el = vm.__patch__(prevVnode, vnode)` 会将oldVnode和newVnode传递给patch方法,然后通过patch方法进行比较差异,将差异更新到真实DOM,把DOM返回存储到$el
