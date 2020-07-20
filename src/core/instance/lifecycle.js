@@ -21,7 +21,7 @@ import {
 export let activeInstance: any = null
 export let isUpdatingChildComponent: boolean = false
 
-export function setActiveInstance(vm: Component) {
+export function setActiveInstance (vm: Component) {
   const prevActiveInstance = activeInstance
   activeInstance = vm
   return () => {
@@ -56,6 +56,7 @@ export function initLifecycle (vm: Component) {
 }
 
 export function lifecycleMixin (Vue: Class<Component>) {
+  // 首次渲染会调用,数据更新会调用
   Vue.prototype._update = function (vnode: VNode, hydrating?: boolean) {
     const vm: Component = this
     const prevEl = vm.$el
