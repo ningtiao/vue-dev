@@ -63,7 +63,7 @@ export function initGlobalAPI (Vue: GlobalAPI) {
   // this is used to identify the "base" constructor to extend all plain-object
   // components with in Weex's multi-instance scenarios.
   Vue.options._base = Vue
-  //这是keep-alive 组件
+  //设置keep-alive 组件
   extend(Vue.options.components, builtInComponents)
   // 注册Vue.use()用来注册插件
   initUse(Vue)
