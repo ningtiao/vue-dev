@@ -169,5 +169,37 @@ export const patch: Function = createPatchFunction({ nodeOps, modules })
 - nodeOps 里面主要进行DOM操作
 - platformModules 和平台相关,导出模块,操作属性和样式,导出了生命周期钩子函数create,update
 - baseModules
+```js
+export function createPatchFunction (backend) {
+  let i, j
+  const cbs = {}
+  // modules 节点的属性/事件/样式的操作
+  // nodeOps节点操作
+  const { modules, nodeOps } = backend
+  for (i = 0; i < hooks.length; ++i) {
+    cbs[hooks[i]] = []
+    for (j = 0; j < modules.length; ++j) {
+      if (isDef(modules[j][hooks[i]])) {
+        // cbs['update'] = [updateAttrs, updateClass, update]
+        cbs[hooks[i]].push(modules[j][hooks[i]])
+      }
+    }
+  }
+  ...
+}
+```
+createPatchFunction类似snabbdom的init,在这个函数最后返回了patch函数,接收一个参数,参数有两个属性,`modules`, `nodeOps`,
+cbs 存储钩子函数,遍历所有钩子函数的名称,把名称作为cbs的对象属性,初始化一个数组,接着遍历所有的modules,如果modules定义了相关钩子函数,则取出放到cbs数组中
 
-createPatchFunction类似snabbdom的init,在这个函数最后返回了patch函数
+### patch函数执行过程
+```js
+return function patch (oldVnode, vnode, hydrating, removeOnly) {
+if (isUndef(vnode)) {
+  if (isDef(oldVnode)) invokeDestroyHook(oldVnode)
+  return
+}
+
+let isInitialPatch = false
+const insertedVnodeQueue = []
+```
+

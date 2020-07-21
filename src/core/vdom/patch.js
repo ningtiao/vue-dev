@@ -696,9 +696,12 @@ export function createPatchFunction (backend) {
       return node.nodeType === (vnode.isComment ? 8 : 3)
     }
   }
-
+  // createPatchFunction({nodeOps, modeuls})传入平台相关的两个参数
+  // core 中的createPatchFunction(backend), const { modules, nodeOps } = backend
+  // core 中的方法和平台无关,传入两个参数后,可以在上面的函数中使用这两个参数
   return function patch (oldVnode, vnode, hydrating, removeOnly) {
     if (isUndef(vnode)) {
+      // 老的VNode存在,执行Destroy钩子函数
       if (isDef(oldVnode)) invokeDestroyHook(oldVnode)
       return
     }
