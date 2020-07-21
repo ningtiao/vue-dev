@@ -136,3 +136,38 @@ prevVnode是从Vue实例获取_vnode,而_vnode是记录之前所处理的vnode�
 
 当数据改变后,会继续调用update方法,此时prevVnode有值,就会执行
 `vm.$el = vm.__patch__(prevVnode, vnode)` 会将oldVnode和newVnode传递给patch方法,然后通过patch方法进行比较差异,将差异更新到真实DOM,把DOM返回存储到$el
+
+### patch函数初始化
+
+定义在src/platforms/web/runtime/index.js
+
+```js
+import { patch } from './patch'
+Vue.prototype.__patch__ = inBrowser ? patch : noop
+```
+
+和平台相关,设置patch方法之前判断了是否是浏览器环境,如果是返回patch函数,如果不是,返回空函数noop
+
+```js
+/* @flow */
+
+import * as nodeOps from 'web/runtime/node-ops'
+import { createPatchFunction } from 'core/vdom/patch'
+import baseModules from 'core/vdom/modules/index'
+import platformModules from 'web/runtime/modules/index'
+
+// the directive module should be applied last, after all
+// built-in modules have been applied.
+const modules = platformModules.concat(baseModules)
+
+export const patch: Function = createPatchFunction({ nodeOps, modules })
+
+```
+
+接下来 patch 函数通过createPatchFunction生成的,需要传入两个参数nodeOps,modules
+
+- nodeOps 里面主要进行DOM操作
+- platformModules 和平台相关,导出模块,操作属性和样式,导出了生命周期钩子函数create,update
+- baseModules
+
+createPatchFunction类似snabbdom的init,在这个函数最后返回了patch函数
