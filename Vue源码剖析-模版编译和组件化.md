@@ -129,3 +129,26 @@ function compile (
 )
 ```
 - 合并选项,调用baseCompiler()进行编译,记录错误,返回编译好的对象
+
+### 模版编译过程-baseCompiler-AST
+- 定义在src/compiler/index.js中
+- 调用parse函数将模版转换成AST抽象语法书,优化抽象语法树,最后返回一个VNode
+
+**抽象语法树**
+- 抽象语法书简称AST(Abstract Syntax Tree)
+- 使用对象的形式描述树形的代码结构
+- 此处的抽象语法树是用来描述树形结构的HTML字符串
+
+**为什么要使用抽象语法树**
+- 模版字符串装换成AST后,可以通过AST对模版做优化处理
+- 标记模版中的静态内容,在patch的时候直接跳过静态内容
+- 在patch的过程中静态内容不需要对比和重新渲染
+- astexplorer.net AST工具
+
+### 模版编译过程-baseCompile-parse
+
+- parse 首先去解析options成员,然后定义了一些变量和成员
+- 对模版解析
+- 返回root
+
+- patch 会依次遍历html模版字符串,转换成ast对象,html中和指令和属性都会记录到相应属性上
