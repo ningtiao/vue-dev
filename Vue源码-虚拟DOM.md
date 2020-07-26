@@ -203,3 +203,13 @@ let isInitialPatch = false
 const insertedVnodeQueue = []
 ```
 
+
+### createElm
+ 
+### patchVnode
+
+### updateChildren
+
+### 没有设置key的情况
+
+### 总结
