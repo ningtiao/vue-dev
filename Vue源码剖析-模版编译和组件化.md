@@ -150,5 +150,59 @@ function compile (
 - parse 首先去解析options成员,然后定义了一些变量和成员
 - 对模版解析
 - 返回root
-
 - patch 会依次遍历html模版字符串,转换成ast对象,html中和指令和属性都会记录到相应属性上
+
+### 模版编译过程-baseCompiler-optimize
+- optimize 首先判断了是否传入了root AST对象,没有直接返回
+- 如果传递,则进行markStatic标记静态节点和markStaticRoots标记静态根结点
+
+### 模版编译过程-generate-上
+
+- generate函数接收两个参数,分别是优化好的AST对象和options对象
+- 把抽象语法树生成字符串形式的js代码
+
+### 模版编译过程-generate-下
+- 定义在src/compiler/codeegen/index.js
+
+```js
+export function generate (
+  ast: ASTElement | void,
+  options: CompilerOptions
+): CodegenResult {
+  const state = new CodegenState(options)
+  const code = ast ? genElement(ast, state) : '_c("div")'
+  return {
+    render: `with(this){return ${code}}`,
+    staticRenderFns: state.staticRenderFns
+  }
+}
+```
+### 模版编译过程-调试
+
+### 模版编译过程-总结
+
+### 组件化回顾
+- 一个Vue组件就是一个拥有预定义选项的一个Vue实例
+- 一个组件可以组成页面上一个功能完备的区域,组件可以包含脚本,样式,模版
+
+### 组件注册
+- 全局注册
+- 局部组件
+```js
+const Comp = Vue.component('comp', {
+  template: '<div>Hello Component</div>'
+})
+
+```
+- 定义在src/core/global-api/assets.js
+- 遍历 ASSET_TYPES 数组,为Vue定义相应方法
+- ASSET_TYPES包括了directive, component, filter
+
+```js
+//  全局组件注册
+if (type === 'component' && isPlainObject(definition)) {
+  definition.name = definition.name || id
+  // 把组件配置转换为组件的构造函数
+  definition = this.options._base.extend(definition)
+}
+```
