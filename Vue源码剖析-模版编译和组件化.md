@@ -206,3 +206,30 @@ if (type === 'component' && isPlainObject(definition)) {
   definition = this.options._base.extend(definition)
 }
 ```
+### Vue.extend
+- 定义在src/core/global-api/extend.js
+- 从缓存中家在组件的构造函数
+- 如果是开发环境验证组件的名称
+```js
+// 从缓存中加载组件的构造函数
+const cachedCtors = extendOptions._Ctor || (extendOptions._Ctor = {})
+if (cachedCtors[SuperId]) {
+  return cachedCtors[SuperId]
+}
+
+const name = extendOptions.name || Super.options.name
+if (process.env.NODE_ENV !== 'production' && name) {
+  // 如果是开发环境验证组件的名称
+  validateComponentName(name)
+}
+```
+- 基于传入的选项对象,创建了构造函数,组件的构造函数继承自Vue的构造函数,所以组件对象拥有Vue实例成员
+
+### 调试组件组册过程
+
+### 组件的创建过程
+
+### 组件的patch过程
+
+- 在patch函数内部,最终会调用createElm函数把vnode转换成真实DOM,挂载到DOM树
+- 组件的创建过程是先创建父组件在创建自组件,组件的挂载是先挂载子组件,在挂载父组件
